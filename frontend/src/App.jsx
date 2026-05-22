@@ -16,6 +16,12 @@ import InsuranceNeedsAnalysis from './pages/InsuranceNeedsAnalysis.jsx';
 import EstateSummary from './pages/EstateSummary.jsx';
 import LeadScoring from './pages/LeadScoring.jsx';
 import MarketCommentary from './pages/MarketCommentary.jsx';
+import BeneficiaryReview from './pages/BeneficiaryReview.jsx';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 function Sidebar() {
   const { user, logout } = useAuth();
@@ -58,6 +64,10 @@ export default function App() {
   if (!user) {
     return (
       <Routes>
+        <Route path="/insights/timeline" element={<TimelineView />} />
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<Login />} />
       </Routes>
@@ -76,6 +86,7 @@ export default function App() {
       <Route path="/tools/estate-summary" element={<ProtectedShell><EstateSummary /></ProtectedShell>} />
       <Route path="/tools/lead-scoring" element={<ProtectedShell><LeadScoring /></ProtectedShell>} />
       <Route path="/tools/market-commentary" element={<ProtectedShell><MarketCommentary /></ProtectedShell>} />
+      <Route path="/tools/beneficiary-review" element={<ProtectedShell><BeneficiaryReview /></ProtectedShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

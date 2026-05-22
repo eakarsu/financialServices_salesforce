@@ -9,4 +9,5 @@ export const TOOLS = [
   { path: '/tools/estate-summary', title: 'Estate Summary', intro: 'Document gaps, titling and beneficiary review.' },
   { path: '/tools/lead-scoring', title: 'Lead Scoring', intro: '0-100 lead score with next-action suggestion.' },
   { path: '/tools/market-commentary', title: 'Market Commentary', intro: 'Compliant client-ready market commentary.' },
+  { path: '/tools/beneficiary-review', title: 'Beneficiary Review', intro: 'Household beneficiary-designation review and estate-plan tasking.' },
 ];

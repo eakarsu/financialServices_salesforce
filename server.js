@@ -11,6 +11,7 @@ app.use(express.json({ limit: '2mb' }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/salesforce-fsc', require('./routes/salesforceFSC')); app.use('/api/goal-planning', require('./routes/goalPlanning')); app.use('/api/tax-rebalancer', require('./routes/taxRebalancer')); app.use('/api/compliance-copilot', require('./routes/complianceCopilot')); app.use('/api/meeting-prep', require('./routes/meetingPrep'));
+app.use('/api/beneficiary-review', require('./routes/beneficiaryReview'));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'financialServices_salesforce', timestamp: new Date().toISOString() });
