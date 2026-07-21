@@ -1,0 +1,47 @@
+name: verify
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: governed_sales_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/governed_sales_test
+      JWT_SECRET: ci-jwt-secret-with-more-than-thirty-two-characters
+      OUTREACH_WEBHOOK_SECRET: ci-webhook-secret-with-more-than-thirty-two-chars
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: npm
+      - run: npm ci
+      - run: npm run migrate
+      - run: npm run migrate
+      - run: npm test
+      - run: npm audit --audit-level=high
+      - run: npm --prefix frontend ci
+      - run: npm --prefix frontend audit --audit-level=high
+      - run: npm --prefix frontend run build
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2

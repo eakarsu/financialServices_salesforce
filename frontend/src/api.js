@@ -17,6 +17,7 @@ export async function apiFetch(path, options = {}) {
   let body = null;
   try { body = await res.json(); } catch (e) { body = null; }
   if (!res.ok) {
+    if (res.status === 401) setToken(null);
     const msg = (body && body.error) || `Request failed (${res.status})`;
     throw new Error(msg);
   }
