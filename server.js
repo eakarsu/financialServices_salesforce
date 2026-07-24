@@ -11,6 +11,7 @@ function createApp(){
   app.use(express.json({limit:'256kb',verify(req,_res,buffer){req.rawBody=buffer.toString('utf8');}}));
   app.use('/api',(req,res,next)=>{const bucket=`${req.ip}:${Math.floor(Date.now()/60000)}`;const count=(counters.get(bucket)||0)+1;counters.set(bucket,count);if(counters.size>5000)counters.clear();if(count>300)return res.status(429).json({error:'API rate limit exceeded'});next();});
   app.use('/api/auth',require('./routes/auth'));
+  app.use('/api/runtime-ai',require('./routes/runtimeAi'));
   app.use('/api/sales',require('./routes/salesOperations'));
   app.use('/api/webhooks/outreach',require('./routes/providerWebhook'));
   app.all(['/api/ai/*','/api/salesforce-fsc/*','/api/goal-planning/*','/api/tax-rebalancer/*','/api/compliance-copilot/*','/api/meeting-prep/*','/api/beneficiary-review/*'],(_req,res)=>res.status(410).json({error:'Ungoverned prototype endpoint retired; use /api/sales'}));
