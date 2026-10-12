@@ -5,6 +5,17 @@ const pool = require('../db');
 
 const router = express.Router();
 
+router.get('/sales-advice/history', auth, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, prompt, content, model, created_at FROM sales_ai_results
+       WHERE tenant_id=$1 AND identity_id=$2 ORDER BY created_at DESC LIMIT 20`,
+      [req.identity.tenant_id, req.identity.id],
+    );
+    return res.json({ results: result.rows });
+  } catch (error) { return next(error); }
+});
+
 router.post('/sales-advice', auth, async (req, res, next) => {
   try {
     const prompt = String(req.body?.prompt || '').trim();

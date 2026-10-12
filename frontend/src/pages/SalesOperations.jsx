@@ -1,9 +1,14 @@
 import React,{useEffect,useState}from'react';
 import{apiFetch}from'../api.js';
 const emptyLead={eventId:'',externalCrmId:'',displayName:'',contactReference:'',region:'US',sourceSystem:'crm',sourceRevision:'',sourceObservedAt:'',attributionSource:''};
-function counts(rows=[]){return rows.map(row=>`${row.lifecycle_state||row.state}: ${row.count}`).join(' · ')||'None'}
+function records(payload, label){
+  const rows = Array.isArray(payload) ? payload : payload?.data ?? payload?.results;
+  if (!Array.isArray(rows)) throw new Error(`${label} response did not contain a record list`);
+  return rows;
+}
+function counts(rows){return (Array.isArray(rows)?rows:[]).map(row=>`${row.lifecycle_state||row.state}: ${row.count}`).join(' · ')||'None'}
 export default function SalesOperations(){const[dashboard,setDashboard]=useState(null);const[leads,setLeads]=useState([]);const[outreach,setOutreach]=useState([]);const[lead,setLead]=useState(emptyLead);const[error,setError]=useState('');const[message,setMessage]=useState('');const[busy,setBusy]=useState(false);
-  async function refresh(){const[d,l,o]=await Promise.all([apiFetch('/api/sales/dashboard'),apiFetch('/api/sales/leads'),apiFetch('/api/sales/outreach')]);setDashboard(d);setLeads(l);setOutreach(o)}useEffect(()=>{refresh().catch(err=>setError(err.message))},[]);
+  async function refresh(){const[d,l,o]=await Promise.all([apiFetch('/api/sales/dashboard'),apiFetch('/api/sales/leads'),apiFetch('/api/sales/outreach')]);setDashboard(d);setLeads(records(l,'Leads'));setOutreach(records(o,'Outreach'));setError('')}useEffect(()=>{refresh().catch(err=>setError(err.message))},[]);
   async function execute(action,success){setBusy(true);setError('');setMessage('');try{await action();setMessage(success);await refresh()}catch(err){setError(err.message)}finally{setBusy(false)}}
   async function ingest(event){event.preventDefault();await execute(()=>apiFetch('/api/sales/sync/crm/leads',{method:'POST',body:JSON.stringify({...lead,sourceObservedAt:new Date(lead.sourceObservedAt).toISOString(),attribution:lead.attributionSource?{source:lead.attributionSource}:{}})}),'CRM event applied idempotently');setLead(emptyLead)}
   async function transition(id,state){await execute(()=>apiFetch(`/api/sales/leads/${id}/transition`,{method:'POST',body:JSON.stringify({state,reason:'Operator-confirmed lifecycle update'})}),`Lead moved to ${state}`)}
